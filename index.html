@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Examen Civique - CSP</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2em; margin-bottom: 10px; }
+        .badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        .content { padding: 40px 30px; }
+        .info-box {
+            background: #fff5f5;
+            border-left: 4px solid #fa709a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .info-box h3 { color: #fa709a; margin-bottom: 15px; }
+        .info-box ul { list-style-position: inside; color: #555; line-height: 1.8; }
+        .btn {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #6c757d; }
+        .hidden { display: none !important; }
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #fa709a 0%, #fee140 100%);
+            height: 100%;
+            transition: width 0.3s;
+        }
+        .question-counter {
+            text-align: center;
+            color: #fa709a;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        .question {
+            background: #fff5f5;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #fa709a;
+        }
+        .question h3 { color: #333; margin-bottom: 20px; font-size: 1.3em; line-height: 1.5; }
+        .option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .option:hover { border-color: #fa709a; background: #fff5f5; }
+        .option.selected { border-color: #fa709a; background: #ffe8ee; }
+        .option input[type="radio"] { margin-right: 15px; width: 20px; height: 20px; accent-color: #fa709a; }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+        .results-screen { text-align: center; }
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 30px auto;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        .score-circle .percentage { font-size: 3em; font-weight: bold; }
+        .result-message { font-size: 1.5em; margin: 20px 0; color: #333; }
+        .result-message.pass { color: #4caf50; }
+        .result-message.fail { color: #f44336; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-card {
+            background: #fff5f5;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #fa709a;
+        }
+        .stat-card .value { font-size: 2em; font-weight: bold; color: #fa709a; }
+        .stat-card .label { color: #666; margin-top: 5px; }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.5em; }
+            .content { padding: 20px 15px; }
+            .navigation { flex-direction: column; }
+            .stats { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇫🇷 Quiz Examen Civique</h1>
+            <p>Carte de Résident (CR)</p>
+            <div class="badge">Niveau CR - 2026</div>
+        </div>
+
+        <div class="content">
+            <div id="welcomeScreen">
+                <h2 style="color: #fa709a; margin-bottom: 20px;">Préparez votre examen civique</h2>
+                <p style="color: #666; margin-bottom: 30px;">Testez vos connaissances avec 40 questions officielles</p>
+                
+                <div class="info-box">
+                    <h3>📋 Format de l'examen</h3>
+                    <ul>
+                        <li>40 questions à choix multiples (QCM)</li>
+                        <li>28 questions de connaissances + 12 mises en situation</li>
+                        <li>1 seule bonne réponse parmi 4 options</li>
+                        <li>Durée maximale : 45 minutes</li>
+                        <li>Score requis : 32/40 (80%) pour réussir</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h3>📚 Thématiques couvertes</h3>
+                    <ul>
+                        <li>Principes et valeurs de la République</li>
+                        <li>Système institutionnel et politique</li>
+                        <li>Droits et devoirs</li>
+                        <li>Histoire, géographie et culture</li>
+                        <li>Vivre dans la société française</li>
+                    </ul>
+                </div>
+
+                <button class="btn" onclick="startQuiz()">Commencer le quiz</button>
+            </div>
+
+            <div id="quizScreen" class="hidden">
+                <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
+                <p class="question-counter" id="questionCounter"></p>
+                <div id="questionContainer"></div>
+                <div class="navigation">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()">← Précédent</button>
+                    <button class="btn" id="nextBtn" onclick="nextQuestion()">Suivant →</button>
+                </div>
+            </div>
+
+            <div id="resultsScreen" class="hidden results-screen">
+                <h2>Résultats de votre examen</h2>
+                <div class="score-circle">
+                    <div class="percentage" id="scorePercentage"></div>
+                    <div>de réussite</div>
+                </div>
+                <div class="result-message" id="resultMessage"></div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="value" id="correctAnswers"></div>
+                        <div class="label">Réponses correctes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="incorrectAnswers"></div>
+                        <div class="label">Réponses incorrectes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="scoreOutOf"></div>
+                        <div class="label">Score total</div>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <p><strong>Note :</strong> Pour réussir l'examen officiel, vous devez obtenir au minimum 32/40 (80%).</p>
+                </div>
+                <button class="btn" onclick="restartQuiz()">Recommencer le quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+const questions = [
+    {question: "Quelle est la devise de la France ?", options: ["Unité, Liberté, Égalité", "Liberté, Égalité, Fraternité", "Égalité, Dignité, Solidarité", "Justice, Paix, Liberté"], correct: 1},
+    {question: "Que représente Marianne ?", options: ["Une reine de France", "La République française", "Une sainte", "Une héroïne historique"], correct: 1},
+    {question: "En quelle année la loi de séparation des Églises et de l'État a-t-elle été votée ?", options: ["1789", "1905", "1958", "2000"], correct: 1},
+    {question: "Une personne a-t-elle le droit de ne pas croire en une religion ?", options: ["Oui, c'est une liberté fondamentale", "Non, tout le monde doit avoir une religion", "Seulement avec l'autorisation de l'État", "Ça dépend de la région"], correct: 0},
+    {question: "Que garantit le principe de laïcité ?", options: ["L'interdiction de toutes les religions", "La liberté de conscience et de culte", "L'obligation d'avoir une religion", "La promotion du catholicisme"], correct: 1},
+    {question: "A-t-on le droit d'insulter publiquement quelqu'un parce qu'il est différent ?", options: ["Oui, c'est la liberté d'expression", "Non, c'est interdit par la loi", "Oui, si c'est vrai", "Ça dépend des circonstances"], correct: 1},
+    {question: "Que fait l'État pour lutter contre les discriminations ?", options: ["Rien, c'est un problème privé", "Il a créé des lois et des institutions pour les combattre", "Il laisse les entreprises décider", "Il interdit les différences"], correct: 1},
+    {question: "Un employeur refuse d'embaucher des femmes dans son entreprise. Que dit la loi ?", options: ["C'est autorisé", "C'est interdit, c'est de la discrimination", "C'est autorisé pour certains métiers", "Ça dépend du secteur"], correct: 1},
+    {question: "Peut-on brûler publiquement un drapeau français ?", options: ["Oui, c'est autorisé", "Non, c'est une infraction", "Oui, si c'est pour protester", "Ça dépend du contexte"], correct: 1},
+    {question: "Qu'est-ce que la Marseillaise ?", options: ["Une danse traditionnelle", "L'hymne national français", "Une ville du sud de la France", "Un monument historique"], correct: 1},
+    {question: "Qui nomme le Premier ministre ?", options: ["Les citoyens par élection", "Le Président de la République", "L'Assemblée nationale", "Le Sénat"], correct: 1},
+    {question: "Le Parlement est composé :", options: ["De l'Assemblée nationale seulement", "Du Sénat seulement", "De l'Assemblée nationale et du Sénat", "De l'Assemblée nationale et du gouvernement"], correct: 2},
+    {question: "La séparation des pouvoirs est un principe fondamental. Quels sont les trois pouvoirs concernés ?", options: ["Exécutif, législatif, judiciaire", "Président, Premier ministre, Parlement", "État, région, commune", "Police, armée, justice"], correct: 0},
+    {question: "Combien de députés composent l'Assemblée nationale ?", options: ["348", "450", "577", "600"], correct: 2},
+    {question: "Est-ce que le président de la République a tous les pouvoirs ?", options: ["Oui, il peut tout décider", "Non, ses pouvoirs sont limités par la Constitution", "Oui, pendant les 100 premiers jours", "Ça dépend de la situation"], correct: 1},
+    {question: "Quel est le rôle du président de la République ?", options: ["Voter les lois", "Garantir l'indépendance de la justice et être le chef des armées", "Juger les criminels", "Diriger les communes"], correct: 1},
+    {question: "Qui est le chef du Gouvernement ?", options: ["Le Président de la République", "Le Premier ministre", "Le président de l'Assemblée nationale", "Le président du Sénat"], correct: 1},
+    {question: "Qu'est-ce que l'Hôtel de Matignon ?", options: ["Un musée parisien", "La résidence du Premier ministre", "Un hôtel de luxe", "Le siège de l'Assemblée nationale"], correct: 1},
+    {question: "En quelle année le traité de Maastricht, qui marque la fondation de l'Union européenne, a-t-il été signé ?", options: ["1957", "1992", "2000", "2007"], correct: 1},
+    {question: "Quel État a quitté l'Union européenne en 2020 ?", options: ["La Norvège", "La Suisse", "Le Royaume-Uni", "L'Islande"], correct: 2},
+    {question: "La peine de mort est :", options: ["Autorisée en France", "Abolie en France", "Autorisée seulement pour les crimes graves", "Décidée au cas par cas"], correct: 1},
+    {question: "Est-il toujours possible de divorcer ?", options: ["Non, jamais", "Oui", "Seulement avec l'accord de l'Église", "Seulement si les deux sont d'accord"], correct: 1},
+    {question: "Qu'est-ce que la Constitution ?", options: ["Un simple document administratif", "La loi fondamentale qui organise les pouvoirs publics", "Un règlement intérieur", "Un traité international"], correct: 1},
+    {question: "Quel est le rôle de la police ?", options: ["Voter les lois", "Assurer la sécurité et l'ordre public", "Juger les criminels", "Diriger le pays"], correct: 1},
+    {question: "Jeter un mégot par terre est :", options: ["Autorisé", "Interdit et peut être sanctionné", "Autorisé si c'est petit", "Autorisé la nuit"], correct: 1},
+    {question: "Que doit faire une victime de violences ?", options: ["Ne rien dire", "Porter plainte et demander de l'aide", "Se venger", "Attendre que ça passe"], correct: 1},
+    {question: "Quelle est l'infraction la plus grave ?", options: ["La contravention", "Le délit", "Le crime", "L'amende"], correct: 2},
+    {question: "L'État peut-il limiter les droits et libertés ?", options: ["Non, jamais", "Oui, pour protéger l'intérêt général et l'ordre public", "Oui, sans limite", "Seulement en temps de guerre"], correct: 1},
+    {question: "Quel roi de France a été exécuté pendant la Révolution française ?", options: ["Louis XIV", "Louis XV", "Louis XVI", "Charles X"], correct: 2},
+    {question: "En quelle année Napoléon Ier est-il devenu empereur ?", options: ["1789", "1799", "1804", "1815"], correct: 2},
+    {question: "Depuis quand les Français élisent-ils le président de la République au suffrage universel direct ?", options: ["1848", "1958", "1962", "1981"], correct: 2},
+    {question: "Durant le mandat de quel président la peine de mort a-t-elle été abolie ?", options: ["Charles de Gaulle", "Georges Pompidou", "Valéry Giscard d'Estaing", "François Mitterrand"], correct: 3},
+    {question: "En quelle année l'euro est-elle devenue la monnaie utilisée en France ?", options: ["1999", "2000", "2002", "2005"], correct: 2},
+    {question: "Quel fleuve traverse Paris ?", options: ["La Loire", "Le Rhône", "La Seine", "La Garonne"], correct: 2},
+    {question: "Quelle est la population approximative de la France en 2025 ?", options: ["50 millions", "60 millions", "68 millions", "75 millions"], correct: 2},
+    {question: "Quelle cathédrale célèbre a été en partie détruite par un incendie en 2019 ?", options: ["La cathédrale de Reims", "Notre-Dame de Paris", "La cathédrale de Chartres", "La cathédrale de Strasbourg"], correct: 1},
+    {question: "Qui était Auguste Rodin ?", options: ["Un écrivain", "Un sculpteur", "Un peintre", "Un musicien"], correct: 1},
+    {question: "Quel musée est situé à Paris ?", options: ["Le Prado", "Le Louvre", "L'Ermitage", "Le British Museum"], correct: 1},
+    {question: "Quel numéro d'urgence permet d'appeler la police ?", options: ["15", "17", "18", "112"], correct: 1},
+    {question: "Où faut-il déclarer la naissance d'un enfant ?", options: ["À la préfecture", "À la mairie", "À l'hôpital", "À la sécurité sociale"], correct: 1}
+];
+
+let currentQuestion = 0;
+let userAnswers = [];
+let shuffledQuestions = [];
+
+function startQuiz() {
+    shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+    currentQuestion = 0;
+    userAnswers = new Array(shuffledQuestions.length).fill(null);
+    document.getElementById('welcomeScreen').classList.add('hidden');
+    document.getElementById('quizScreen').classList.remove('hidden');
+    displayQuestion();
+}
+
+function displayQuestion() {
+    const q = shuffledQuestions[currentQuestion];
+    document.getElementById('questionCounter').textContent = `Question ${currentQuestion + 1}/${shuffledQuestions.length}`;
+    document.getElementById('progressBar').style.width = ((currentQuestion + 1) / shuffledQuestions.length * 100) + '%';
+    
+    let html = `<div class="question"><h3>${q.question}</h3>`;
+    q.options.forEach((opt, i) => {
+        const checked = userAnswers[currentQuestion] === i ? 'checked' : '';
+        const selected = userAnswers[currentQuestion] === i ? 'selected' : '';
+        html += `<label class="option ${selected}">
+            <input type="radio" name="answer" value="${i}" ${checked} onchange="selectAnswer(${i})">
+            <span>${opt}</span>
+        </label>`;
+    });
+    html += '</div>';
+    document.getElementById('questionContainer').innerHTML = html;
+    
+    document.getElementById('prevBtn').disabled = currentQuestion === 0;
+    document.getElementById('nextBtn').textContent = currentQuestion === shuffledQuestions.length - 1 ? 'Voir les résultats' : 'Suivant →';
+}
+
+function selectAnswer(index) {
+    userAnswers[currentQuestion] = index;
+    displayQuestion();
+}
+
+function nextQuestion() {
+    if (currentQuestion < shuffledQuestions.length - 1) {
+        currentQuestion++;
+        displayQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function previousQuestion() {
+    if (currentQuestion > 0) {
+        currentQuestion--;
+        displayQuestion();
+    }
+}
+
+function showResults() {
+    let score = 0;
+    userAnswers.forEach((answer, index) => {
+        if (answer === shuffledQuestions[index].correct) score++;
+    });
+    
+    const percentage = Math.round((score / shuffledQuestions.length) * 100);
+    const passed = score >= 32;
+    
+    document.getElementById('quizScreen').classList.add('hidden');
+    document.getElementById('resultsScreen').classList.remove('hidden');
+    
+    document.getElementById('scorePercentage').textContent = percentage + '%';
+    document.getElementById('correctAnswers').textContent = score;
+    document.getElementById('incorrectAnswers').textContent = shuffledQuestions.length - score;
+    document.getElementById('scoreOutOf').textContent = `${score}/${shuffledQuestions.length}`;
+    
+    const msg = document.getElementById('resultMessage');
+    msg.textContent = passed ? '🎉 Félicitations ! Vous avez réussi !' : '😔 Vous n\'avez pas atteint le score requis (32/40)';
+    msg.className = passed ? 'result-message pass' : 'result-message fail';
+}
+
+function restartQuiz() {
+    document.getElementById('resultsScreen').classList.add('hidden');
+    document.getElementById('welcomeScreen').classList.remove('hidden');
+}
+    </script>
+</body>
+</html>
